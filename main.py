@@ -26,19 +26,31 @@ def get_db_connection():
 
 @app.on_event("startup")
 async def startup_event():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    # Create the 'messages' table if it doesn't already exist
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS messages (
-            id SERIAL PRIMARY KEY,
-            content TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        print("Attempting to connect to the database...")
+        conn = get_db_connection()
+        cur = conn.cursor()
+        print("Database connection successful. Creating table if it does not exist...")
+
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS messages (
+                id SERIAL PRIMARY KEY,
+                content TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("Startup complete. Table 'messages' is ready.")
+
+    except Exception as e:
+        # This will print the exact error to your Render logs
+        print("!!! DATABASE CONNECTION FAILED !!!")
+        print(f"Error: {e}")
+        # Re-raise the exception to ensure the app still fails to start
+        # This prevents the app from running in a broken state.
+        raise e
 
 # Endpoint to create a new message (handles POST requests)
 
