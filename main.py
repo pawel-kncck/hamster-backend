@@ -46,7 +46,7 @@ async def startup_event():
 @app.post("/api/messages")
 async def create_message(message: MessageCreate):
     conn = get_db_connection()
-    cur - conn.cursor()
+    cur = conn.cursor()
     try:
         # Insert a new record into the messages table
         cur.execute("INSERT INTO messages (content) VALUES (%s)",
@@ -76,7 +76,7 @@ async def get_messages():
         messages_list = [{"id": msg[0], "content": msg[1],
                           "created_at": str(msg[2])} for msg in messages]
     finally:
-        curr.close()
+        cur.close()
         conn.close()
 
 # Define a "route" or "endpoint"
